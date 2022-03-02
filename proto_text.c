@@ -546,6 +546,7 @@ static inline void process_get_command(conn *c, token_t *tokens, size_t ntokens,
     bool fail_length = false;
     assert(c != NULL);
     mc_resp *resp = c->resp;
+    struct timeval tv;
 
     if (should_touch) {
         // For get and touch commands, use first token as exptime
@@ -620,7 +621,9 @@ static inline void process_get_command(conn *c, token_t *tokens, size_t ntokens,
 
                 if (settings.verbose > 1) {
                     int ii;
-                    fprintf(stderr, ">%d sending key ", c->sfd);
+                    gettimeofday(&tv,NULL);
+                    unsigned long time_in_micros = 1000000 * tv.tv_sec + tv.tv_usec;
+                    fprintf(stderr, ">%d sending key %lu", c->sfd, time_in_micros);
                     for (ii = 0; ii < it->nkey; ++ii) {
                         fprintf(stderr, "%c", key[ii]);
                     }
@@ -683,7 +686,9 @@ static inline void process_get_command(conn *c, token_t *tokens, size_t ntokens,
 stop:
 
     if (settings.verbose > 1)
-        fprintf(stderr, ">%d END\n", c->sfd);
+        gettimeofday(&tv,NULL);
+        unsigned long time_in_micros = 1000000 * tv.tv_sec + tv.tv_usec;
+        fprintf(stderr, ">%d END %lu\n", c->sfd, time_in_micros);
 
     /*
         If the loop was terminated because of out-of-memory, it is not
@@ -2689,13 +2694,16 @@ static void process_command(conn *c, char *command) {
     token_t tokens[MAX_TOKENS];
     size_t ntokens;
     int comm;
+    struct timeval tv;
 
     assert(c != NULL);
 
     MEMCACHED_PROCESS_COMMAND_START(c->sfd, c->rcurr, c->rbytes);
 
     if (settings.verbose > 1)
-        fprintf(stderr, "<%d %s\n", c->sfd, command);
+        gettimeofday(&tv,NULL);
+        unsigned long time_in_micros = 1000000 * tv.tv_sec + tv.tv_usec;
+        fprintf(stderr, "<%d %s %lu\n", c->sfd, command, time_in_micros);
 
     /*
      * for commands set/add/replace, we build an item and read the data
