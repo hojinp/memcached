@@ -955,6 +955,7 @@ void item_stats_sizes(ADD_STAT add_stats, void *c) {
 /** wrapper around assoc_find which does the lazy expiration logic */
 item *do_item_get(const char *key, const size_t nkey, const uint32_t hv, conn *c, const bool do_update) {
     item *it = assoc_find(key, nkey, hv);
+    struct timeval tv;
     if (it != NULL) {
         refcount_incr(it);
         /* Optimization for slab reassignment. prevents popular items from
@@ -983,9 +984,13 @@ item *do_item_get(const char *key, const size_t nkey, const uint32_t hv, conn *c
     if (settings.verbose > 2) {
         int ii;
         if (it == NULL) {
-            fprintf(stderr, "> NOT FOUND ");
+            gettimeofday(&tv,NULL);
+            unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
+            fprintf(stderr, "[%lu] > NOT FOUND ", ut);
         } else {
-            fprintf(stderr, "> FOUND KEY ");
+            gettimeofday(&tv,NULL);
+            unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
+            fprintf(stderr, "[%lu] > FOUND KEY ", ut);
         }
         for (ii = 0; ii < nkey; ++ii) {
             fprintf(stderr, "%c", key[ii]);

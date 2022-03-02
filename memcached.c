@@ -976,11 +976,14 @@ static const char *state_text(enum conn_states state) {
 void conn_set_state(conn *c, enum conn_states state) {
     assert(c != NULL);
     assert(state >= conn_listening && state < conn_max_state);
+    struct timeval tv;
 
     if (state != c->state) {
         if (settings.verbose > 2) {
-            fprintf(stderr, "%d: going from %s to %s\n",
-                    c->sfd, state_text(c->state),
+            gettimeofday(&tv,NULL);
+            unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
+            fprintf(stderr, "[%lu] %d: going from %s to %s\n",
+                    ut, c->sfd, state_text(c->state),
                     state_text(state));
         }
 
@@ -1219,6 +1222,7 @@ void out_string(conn *c, const char *str) {
     size_t len;
     assert(c != NULL);
     mc_resp *resp = c->resp;
+    struct timeval tv;
 
     // if response was original filled with something, but we're now writing
     // out an error or similar, have to reset the object first.
@@ -1237,8 +1241,11 @@ void out_string(conn *c, const char *str) {
         return;
     }
 
-    if (settings.verbose > 1)
-        fprintf(stderr, ">%d %s\n", c->sfd, str);
+    if (settings.verbose > 1) {
+        gettimeofday(&tv,NULL);
+        unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
+        fprintf(stderr, "[%lu] >%d %s\n", ut, c->sfd, str);
+    }
 
     // Fill response object with static string.
 

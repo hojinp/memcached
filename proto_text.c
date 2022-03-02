@@ -622,8 +622,8 @@ static inline void process_get_command(conn *c, token_t *tokens, size_t ntokens,
                 if (settings.verbose > 1) {
                     int ii;
                     gettimeofday(&tv,NULL);
-                    unsigned long time_in_micros = 1000000 * tv.tv_sec + tv.tv_usec;
-                    fprintf(stderr, ">%d sending key %lu", c->sfd, time_in_micros);
+                    unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
+                    fprintf(stderr, "[%lu] >%d sending key", ut, c->sfd);
                     for (ii = 0; ii < it->nkey; ++ii) {
                         fprintf(stderr, "%c", key[ii]);
                     }
@@ -687,8 +687,8 @@ stop:
 
     if (settings.verbose > 1)
         gettimeofday(&tv,NULL);
-        unsigned long time_in_micros = 1000000 * tv.tv_sec + tv.tv_usec;
-        fprintf(stderr, ">%d END %lu\n", c->sfd, time_in_micros);
+        unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
+        fprintf(stderr, "[%lu] >%d END\n", ut, c->sfd);
 
     /*
         If the loop was terminated because of out-of-memory, it is not
@@ -2702,8 +2702,8 @@ static void process_command(conn *c, char *command) {
 
     if (settings.verbose > 1)
         gettimeofday(&tv,NULL);
-        unsigned long time_in_micros = 1000000 * tv.tv_sec + tv.tv_usec;
-        fprintf(stderr, "<%d %s %lu\n", c->sfd, command, time_in_micros);
+        unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
+        fprintf(stderr, "[%lu] <%d %s\n", ut, c->sfd, command);
 
     /*
      * for commands set/add/replace, we build an item and read the data
