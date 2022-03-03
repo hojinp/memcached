@@ -685,10 +685,11 @@ static inline void process_get_command(conn *c, token_t *tokens, size_t ntokens,
     } while(key_token->value != NULL);
 stop:
 
-    if (settings.verbose > 1)
+    if (settings.verbose > 1) {
         gettimeofday(&tv,NULL);
         unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
         fprintf(stderr, "[%lu] >%d END\n", ut, c->sfd);
+    }
 
     /*
         If the loop was terminated because of out-of-memory, it is not
@@ -2700,10 +2701,11 @@ static void process_command(conn *c, char *command) {
 
     MEMCACHED_PROCESS_COMMAND_START(c->sfd, c->rcurr, c->rbytes);
 
-    if (settings.verbose > 1)
+    if (settings.verbose > 1) {
         gettimeofday(&tv,NULL);
         unsigned long ut = 1000000 * tv.tv_sec + tv.tv_usec;
         fprintf(stderr, "[%lu] <%d %s\n", ut, c->sfd, command);
+    }
 
     /*
      * for commands set/add/replace, we build an item and read the data
